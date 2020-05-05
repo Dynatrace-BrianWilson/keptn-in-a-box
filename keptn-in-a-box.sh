@@ -23,6 +23,34 @@ TENANT=
 PAASTOKEN=
 APITOKEN=
 
+## Get/Set EC2 Instnace ID, Elastic IP instance, and 'aws configure' data
+EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
+ELASTIC_ALLOCATION_ID=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+REGION=us-east-2
+OUTPUT=json
+
+## install AWS CLI
+sudo apt install unzip
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+## Configure AWS CLI
+mkdir ~/.aws
+touch ~/.aws/credentials
+echo "[default]" >> ~/.aws/credentials
+echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
+touch ~/.aws/config
+echo "[default]" >> ~/.aws/config
+echo "region=$REGION" >> ~/.aws/config
+echo "output=$OUTPUT" >> ~/.aws/config
+
+## associate ElasticIP with EC2 Instance
+aws ec2 associate-address --instance-id $EC2_INSTANCE_ID --allocation-id 	$ELASTIC_ALLOCATION_ID
+
 # Set your custom domain e.g for an internal machine like 192.168.0.1.nip.io
 # So Keptn and all other services are routed and exposed properly via the Ingress Gateway
 # if no DOMAIN is setted, the public IP of the machine will be converted to a magic nip.io domain   
@@ -85,19 +113,19 @@ source $FUNCTIONS_FILE
 
 # --- Enable the installation Modules --- 
 # Uncomment for installing the Default 
-installationModulesDefault
+#installationModulesDefault
 
 # - Uncomment below for installing the minimal setup
 #installationModulesMinimal
 
 # - Uncomment below for installing all features
-#installationModulesFull
+installationModulesFull
 
 # -- Override a module like for example verbose output of all commands
 #verbose_mode=true
 # -- or install cert manager 
-#certmanager_install=true
-#certmanager_enable=true
+certmanager_install=true
+certmanager_enable=true
 
 # *** Do Installation 
 doInstallation
